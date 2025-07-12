@@ -1,6 +1,5 @@
 {
   "name": "scripts",
-  "module": "index.ts",
   "type": "module",
   "private": true,
   "scripts": {
@@ -14,6 +13,10 @@
     "typescript": "^5"
   },
   "dependencies": {
+    "eslint": "^9.31.0",
+    "prettier": "^3.5.3",
+    "eslint-config-prettier": "^10.1.5",
+    "eslint-plugin-prettier": "^5.5.0",
     "pdf-merger-js": "^5.1.2",
     "yargs": "^18.0.0",
     "zod": "^4.0.5"
