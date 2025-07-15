@@ -22,11 +22,12 @@ const argSchema = z.object({
   i: z.coerce.number().max(100).min(1).default(100),
 });
 
-const { success, data } = await argSchema.safeParseAsync(
+const { success, data, error } = await argSchema.safeParseAsync(
   yargs(hideBin(process.argv)).parse(),
 );
 
 if (!success) {
+  console.error(error);
   throw new Error(
     "Usage: pdf-compressor -o <output-filepath> -i <img-compress> -r <resolution> <input-filepath>",
   );

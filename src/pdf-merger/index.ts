@@ -12,11 +12,12 @@ const argSchema = z.object({
   o: z.string(),
 });
 
-const { success, data } = await argSchema.safeParseAsync(
+const { success, data, error } = await argSchema.safeParseAsync(
   yargs(hideBin(process.argv)).parse(),
 );
 
 if (!success) {
+  console.error(error);
   throw new Error(
     "Usage: pdf-merger -o <output-filepath> <input-filepath-1> <input-filepath-2> ... <input-filepath-n>",
   );
