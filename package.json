@@ -3,6 +3,7 @@
   "type": "module",
   "private": true,
   "scripts": {
+    "migrate-to-nest": "bun ./src/migrate-to-nest/index.ts",
     "pdf-merger:build:windows": "bun build --compile --target=bun-windows-x64-baseline ./src/pdf-merger/index.ts --outfile out/pdf-merger"
   },
   "devDependencies": {
@@ -10,7 +11,7 @@
     "@types/yargs": "^17.0.33"
   },
   "peerDependencies": {
-    "typescript": "^5"
+    "typescript": "^5.8.3"
   },
   "dependencies": {
     "compress-pdf": "^0.5.4",
@@ -19,11 +20,14 @@
     "eslint-plugin-prettier": "^5.5.0",
     "pdf-merger-js": "^5.1.2",
     "prettier": "^3.5.3",
+    "ts-morph": "^26.0.0",
     "yargs": "^18.0.0",
     "zod": "^4.0.5"
   },
   "bin": {
     "pdf-merger": "src/pdf-merger/index.ts",
-    "pdf-compressor": "src/pdf-compressor/index.ts"
+    "pdf-compressor": "src/pdf-compressor/index.ts",
+    "geojson-converter": "src/geojson/unico-segment-to-geojson.ts",
+    "ofg-to-geojson": "src/ofg-to-geojson/index.ts"
   }
 }
