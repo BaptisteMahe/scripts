@@ -17,25 +17,21 @@ const argSchema = z
 
 const inputs = argSchema.parse(yargs(hideBin(process.argv)).parse());
 
-let endpoint: string;
-if ("dev" in inputs) endpoint = "https://api.dev.unicofrance.com";
-else if ("pre-prod" in inputs)
-  endpoint = "https://api.pre-prod.unicofrance.com";
-else if ("prod" in inputs) endpoint = "https://api.prod.unicofrance.com";
-else endpoint = "http://localhost:3000";
+let url: string;
+if ("dev" in inputs) url = "https://api.dev.unicofrance.com";
+else if ("pre-prod" in inputs) url = "https://api.pre-prod.unicofrance.com";
+else if ("prod" in inputs) url = "https://api.prod.unicofrance.com";
+else url = "http://localhost:3000";
 
 const auth = await Bun.file(`${homedir()}/.unico/unitech/auth.json`)
   .text()
   .then((value) => JSON.parse(value));
 
-const authorizedClientsResponse = await fetch(
-  `${endpoint}/auth/enabled-clients`,
-  {
-    method: "POST",
-    body: JSON.stringify(auth),
-    headers: { "Content-Type": "application/json" },
-  },
-);
+const authorizedClientsResponse = await fetch(`${url}/auth/enabled-clients`, {
+  method: "POST",
+  body: JSON.stringify(auth),
+  headers: { "Content-Type": "application/json" },
+});
 
 const clients = (await authorizedClientsResponse.json()) as {
   id: string;
@@ -49,7 +45,7 @@ if (!client)
     `Invalid choice (choice should be a number between 0 and ${clients.length - 1})`,
   );
 
-const tokenResponse = await fetch(`${endpoint}/auth/token`, {
+const tokenResponse = await fetch(`${url}/auth/token`, {
   method: "POST",
   body: JSON.stringify({ ...auth, idClient: client.id }),
   headers: { "Content-Type": "application/json" },

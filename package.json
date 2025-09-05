@@ -29,6 +29,7 @@
     "pdf-compressor": "src/pdf-compressor/index.ts",
     "geojson-converter": "src/geojson/unico-segment-to-geojson.ts",
     "ofg-to-geojson": "src/ofg-to-geojson/index.ts",
-    "unico-auth": "src/unico-auth/index.ts"
+    "uauth": "src/unitech-auth/index.ts",
+    "ucall": "src/unitech-call/index.ts"
   }
 }
