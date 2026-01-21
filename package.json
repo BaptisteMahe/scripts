@@ -15,6 +15,7 @@
     "typescript": "^5.8.3"
   },
   "dependencies": {
+    "@types/geojson": "^7946.0.16",
     "compress-pdf": "^0.5.4",
     "eslint": "^9.31.0",
     "eslint-config-prettier": "^10.1.5",
@@ -31,6 +32,7 @@
     "pdf-merger": "src/pdf-merger/index.ts",
     "pdf-compressor": "src/pdf-compressor/index.ts",
     "geojson-converter": "src/geojson/unico-segment-to-geojson.ts",
+    "spagetti-traj": "src/spagetti-traj/index.ts",
     "ofg-to-geojson": "src/ofg-to-geojson/index.ts",
     "uauth": "src/unitech-auth/index.ts",
     "ucall": "src/unitech-call/index.ts"
