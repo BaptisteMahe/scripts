@@ -71,35 +71,55 @@ function processTrajBySinglePoint(points: Position[]): Position[] {
  * This function should split the trajectory by pair of points (duplicating all points except the first one & last one).
  * Then every pair of points should be offsetted accordingly to the number of times we go through the same pair of points.
  */
-function processTrajByPairOfPoints(points: Position[]): Position[][] {
+function processTrajByPairOfPoints(points: Position[]): Position[] {
   const offsetStep = 0.00001;
   const counts = new Map<string, number>();
 
-  return points.slice(0, -1).map((point, index) => {
-    const nextPoint = points[index + 1]!;
-    const [startLng = 0, startLat = 0, ...startRest] = point;
-    const [endLng = 0, endLat = 0, ...endRest] = nextPoint;
-    const key = `${startLng.toFixed(6)}:${startLat.toFixed(6)}->${endLng.toFixed(6)}:${endLat.toFixed(6)}`;
-    const count = (counts.get(key) ?? 0) + 1;
-    counts.set(key, count);
+  const segments: Array<[Position, Position]> = points
+    .slice(0, -1)
+    .map((point, index) => {
+      const nextPoint = points[index + 1]!;
+      const [startLng = 0, startLat = 0, ...startRest] = point;
+      const [endLng = 0, endLat = 0, ...endRest] = nextPoint;
+      const key = `${startLng.toFixed(6)}:${startLat.toFixed(6)}->${endLng.toFixed(6)}:${endLat.toFixed(6)}`;
+      const count = (counts.get(key) ?? 0) + 1;
+      counts.set(key, count);
 
-    const dx = endLng - startLng;
-    const dy = endLat - startLat;
-    const length = Math.hypot(dx, dy);
+      const dx = endLng - startLng;
+      const dy = endLat - startLat;
+      const length = Math.hypot(dx, dy);
 
-    if (length === 0) {
-      return [point, nextPoint];
+      if (length === 0) {
+        return [point, nextPoint];
+      }
+
+      const offset = offsetStep * count;
+      const offsetX = (-dy / length) * offset;
+      const offsetY = (dx / length) * offset;
+
+      return [
+        [startLng + offsetX, startLat + offsetY, ...startRest],
+        [endLng + offsetX, endLat + offsetY, ...endRest],
+      ];
+    });
+
+  return points.map((_, index) => {
+    if (index === 0) {
+      return segments[0]?.[0] ?? points[0]!;
     }
 
-    const offset = offsetStep * count;
-    const offsetX = (-dy / length) * offset;
-    const offsetY = (dx / length) * offset;
+    if (index === points.length - 1) {
+      return segments.at(-1)?.[1] ?? points[points.length - 1]!;
+    }
 
-    return [
-      [startLng + offsetX, startLat + offsetY, ...startRest],
-      [endLng + offsetX, endLat + offsetY, ...endRest],
-    ];
+    const left = segments[index - 1]?.[1] ?? points[index]!;
+    const right = segments[index]?.[0] ?? points[index]!;
+    return averagePosition(left, right);
   });
+}
+
+function averagePosition(left: Position, right: Position): Position {
+  return [(left[0]! + right[0]!) / 2, (left[1]! + right[1]!) / 2];
 }
 
 const output: FeatureCollection<LineString> = {
@@ -108,6 +128,7 @@ const output: FeatureCollection<LineString> = {
     {
       ...traj.features[0]!,
       properties: {
+        name: "single-point-offset",
         stroke: "#00FF00",
       },
       geometry: {
@@ -117,18 +138,19 @@ const output: FeatureCollection<LineString> = {
         ),
       },
     },
-    ...processTrajByPairOfPoints(traj.features[0]!.geometry.coordinates).map(
-      (points) => ({
-        ...traj.features[0]!,
-        properties: {
-          stroke: "#FF0000",
-        },
-        geometry: {
-          type: "LineString" as const,
-          coordinates: points,
-        },
-      }),
-    ),
+    {
+      ...traj.features[0]!,
+      properties: {
+        name: "pair-of-points-offset-with-averages",
+        stroke: "#FF0000",
+      },
+      geometry: {
+        type: "LineString",
+        coordinates: processTrajByPairOfPoints(
+          traj.features[0]!.geometry.coordinates,
+        ),
+      },
+    },
   ],
 };
 
